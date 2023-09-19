@@ -1,20 +1,22 @@
 import {
-  Pressable,
-  SafeAreaView,
   StyleSheet,
   Text,
   View,
+  SafeAreaView,
+  Pressable,
   Image,
   FlatList,
 } from 'react-native';
-import React from 'react';
+import React, {useContext} from 'react';
 import {arrow, netflix} from '../assets';
 import {signOut} from 'firebase/auth';
 import {auth} from '../firebase';
 import {useNavigation} from '@react-navigation/native';
-
+import {MovieItems} from './Context';
 const ProfileScreen = () => {
   const navigation = useNavigation();
+  const {profile, setProfile} = useContext(MovieItems);
+  console.log('selected profile: ', profile);
   const profiles = [
     {
       id: '0',
@@ -38,24 +40,23 @@ const ProfileScreen = () => {
       id: '3',
       image:
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-yQFL1YOsN3esm6p1jB1HT-Q6qKtxtZqh9LGwMDIgDCy-p54eMf8jdGSN6yZUeySqseA&usqp=CAU',
-      name: 'shubham',
+      name: 'Shubham',
     },
   ];
-
-  const OnSignOutUser = () => {
+  const signOutUser = () => {
     signOut(auth)
       .then(() => {
         navigation.replace('Login');
       })
-      .catch(error => {
-        console.log(error);
+      .catch(err => {
+        console.log(err);
       });
   };
-
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'black'}}>
       <Pressable
-        style={{flexDirection: 'row', alignItems: 'center', marginLeft: 20}}>
+        onPress={() => navigation.navigate('Home')}
+        style={{flexDirection: 'row', alignItems: 'center', marginLeft: 10}}>
         <Image
           style={{height: 22, width: 22, tintColor: 'white'}}
           source={arrow}
@@ -63,65 +64,67 @@ const ProfileScreen = () => {
         <Text
           style={{
             color: 'white',
-            fontSize: 25,
-            fontWeight: '500',
-            marginLeft: 10,
+            fontSize: 20,
+            fontWeight: '600',
+            marginLeft: 6,
           }}>
           Profiles and more
         </Text>
       </Pressable>
-      <View style={{justifyContent: 'center', alignItems: 'center'}}>
+
+      <View style={{alignItems: 'center', justifyContent: 'center'}}>
         <Image
-          style={{height: 100, width: 150, marginTop: 10}}
+          style={{height: 70, width: 120, marginTop: 20}}
           source={netflix}
-          resizeMode="contain"></Image>
+        />
       </View>
-      <View
-        style={{
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginTop: 40,
-        }}>
-        <Text style={{color: 'gray', fontSize: 16, fontWeight: '800'}}>
-          Who's Watching ?
+
+      <View style={{marginTop: 50, alignItems: 'center'}}>
+        <Text style={{color: 'gray', fontSize: 16, fontWeight: '600'}}>
+          Who's Watching?
         </Text>
+
         <FlatList
           numColumns={2}
           data={profiles}
-          keyExtractor={item => item?.id}
           renderItem={({item}) => (
-            <Pressable style={{marginHorizontal: 10, padding: 20}}>
+            <Pressable
+              onPress={() => {
+                setProfile(item);
+                navigation.navigate('Loading');
+              }}
+              style={{marginHorizontal: 10, padding: 20, marginTop: 10}}>
               <Image
                 style={{
-                  height: 110,
                   width: 110,
-                  borderRadius: 8,
+                  height: 110,
+                  borderRadius: 7,
                   resizeMode: 'contain',
                 }}
-                source={{uri: item?.image}}
-                resizeMode="contain"></Image>
+                source={{uri: item.image}}
+              />
               <Text
                 style={{
                   textAlign: 'center',
                   color: 'white',
-                  fontSize: 20,
+                  fontSize: 15,
                   fontWeight: '500',
-                  marginTop: 5,
+                  marginTop: 10,
                 }}>
-                {item?.name}
+                {item.name}
               </Text>
             </Pressable>
           )}
         />
       </View>
-      <Pressable onPress={OnSignOutUser}>
+
+      <Pressable onPress={signOutUser}>
         <Text
           style={{
+            fontSize: 18,
             textAlign: 'center',
             color: 'gray',
-            fontWeight: '600',
-            fontSize: 20,
-            marginTop: 20,
+            marginTop: 15,
           }}>
           Sign Out
         </Text>
