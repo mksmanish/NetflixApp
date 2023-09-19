@@ -7,3 +7,7 @@ export const tv = require('./icons/tv.png');
 export const tablet = require('./icons/tablet.png');
 export const television = require('./icons/television.png');
 export const arrow = require('./icons/arrow.png');
+export const searchImag = require('./icons/search.png');
+export const plus = require('./icons/plus.png');
+export const info = require('./icons/info.png');
+export const playbutton = require('./icons/playbutton.png');
