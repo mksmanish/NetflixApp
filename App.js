@@ -3,6 +3,7 @@ import React from 'react';
 import StackNavigator from './StackNavigator';
 import {StripeProvider} from '@stripe/stripe-react-native';
 import {ProfileContext} from './screens/Context';
+// publishableKey is present when register on stripe website
 
 const App = () => {
   return (
