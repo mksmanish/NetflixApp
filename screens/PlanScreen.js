@@ -6,6 +6,7 @@ import {
   Image,
   Pressable,
   ScrollView,
+  Alert,
 } from 'react-native';
 import React, {useState} from 'react';
 import {
@@ -19,11 +20,52 @@ import {
 } from '../assets';
 import Plans from '../data/Plans';
 import {moderateScale} from 'react-native-size-matters';
+import {createUserWithEmailAndPassword} from 'firebase/auth';
+import {useStripe} from '@stripe/stripe-react-native';
+import {useRoute} from '@react-navigation/native';
+import {auth} from '../firebase';
 
 const PlanScreen = () => {
   const data = Plans;
   const [selected, setSelected] = useState([]);
   const [price, setPrice] = useState();
+  const route = useRoute();
+  const email = route.params.email;
+  const password = route.params.password;
+  console.log('data hai ye', email, password, auth);
+  const stripe = useStripe();
+  const subscribe = async () => {
+    const response = await fetch('http://localhost:8000/payment', {
+      method: 'POST',
+      body: JSON.stringify({
+        amount: Math.floor(price * 100),
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const data = await response.json();
+    console.log(data);
+    if (!response.ok) return Alert.alert(data.message);
+    const clientSecret = data.clientSecret;
+    const initSheet = await stripe.initPaymentSheet({
+      paymentIntentClientSecret: clientSecret,
+    });
+    if (initSheet.error) return Alert.alert(initSheet.error.message);
+    const presentSheet = await stripe.presentPaymentSheet({
+      clientSecret,
+    });
+    if (presentSheet.error) return Alert.alert(presentSheet.error.message);
+    else {
+      createUserWithEmailAndPassword(auth, email, password).then(
+        userCredentials => {
+          console.log(userCredentials);
+          const user = userCredentials.user;
+          console.log(user.email);
+        },
+      );
+    }
+  };
   const TextLabel = ({label}) => {
     return (
       <View style={{flexDirection: 'row', marginTop: 6}}>
@@ -165,6 +207,7 @@ const PlanScreen = () => {
       </ScrollView>
       {selected.length > 0 ? (
         <Pressable
+          onPress={subscribe}
           style={{
             backgroundColor: 'red',
             padding: 10,
@@ -176,7 +219,7 @@ const PlanScreen = () => {
           }}>
           <View>
             <Text style={{color: 'white', fontSize: 17, fontWeight: '600'}}>
-              Selected {selected}
+              Selected Plan {selected}
             </Text>
           </View>
           <Pressable>

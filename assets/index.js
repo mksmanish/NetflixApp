@@ -6,3 +6,4 @@ export const laptop = require('./icons/laptop.png');
 export const tv = require('./icons/tv.png');
 export const tablet = require('./icons/tablet.png');
 export const television = require('./icons/television.png');
+export const arrow = require('./icons/arrow.png');
